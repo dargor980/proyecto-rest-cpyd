@@ -1,5 +1,15 @@
 const request = require('request-promise');
 const cheerio = require('cheerio');
+const { Pool } = require('pg');
+
+
+const pool = new Pool({
+    host:'localhost',
+    user:'senku',
+    password:'root',
+    database:'paralela',
+    port:'5432'
+});
 
 
 const loginClient = async (req, res) => {
@@ -7,7 +17,9 @@ const loginClient = async (req, res) => {
 }
 
 const getStations = async (req, res) => {
-
+    res.json({
+        mensaje: "this"
+    })
 }
 
 const getStation = async (req, res) => {

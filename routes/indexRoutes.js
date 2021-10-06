@@ -12,4 +12,7 @@ router.get('/context/:codigo/stations', getStation);
 router.post('/context/search', search);
 router.get('/context/:indicador/:latitud/:longitud/estimate', getEstimate);
 
+
+app.use('/', router);
+
 module.exports = app;
