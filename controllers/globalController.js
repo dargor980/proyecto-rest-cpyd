@@ -3,6 +3,9 @@ const cheerio = require('cheerio');
 const { pool } = require('./bdConnection');
 const moment = require('moment');
 
+var fs = require('fs');
+const path = require('path')
+
 async function init(){
     const $ = await request({
         uri: 'https://climatologia.meteochile.gob.cl/application/diario/boletinClimatologicoDiario/actual',
@@ -26,6 +29,31 @@ async function init(){
 }
 
 init();
+
+const directoryPath = path.join(__dirname, 'Estaciones');
+
+async function readDirectories(path){
+    const dir = await fs.promises.opendir(path);
+    for await (const dirent of dir){
+        const data = await fs.promises.opendir(directoryPath + '/' + dirent.name)
+        for await (const files of data){
+            console.log(files.name);
+            var i = files.name.split('.').pop();
+            console.log(i);
+            if(i === 'txt'){
+                var data2 = fs.readFileSync(directoryPath + '/' + dirent.name + '/' + files.name, 'utf8');
+                console.log(data2.toString());  
+            }
+            if(i === 'xls'){
+                var data2 = fs.readFileSync(directoryPath + '/' + dirent.name + '/' + files.name, 'utf8');
+                console.log(data2.toString());  
+            }
+        }
+        console.log(dirent.name);
+    }
+}
+ 
+readDirectories(directoryPath).catch(console.error);
 
 const loginClient = async (req, res) => {
 
