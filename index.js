@@ -3,9 +3,21 @@ const request = require('request-promise');
 const cors = require('cors');
 const { json } = require('express');
 const os = require('os');
+const fs = require('fs');
 const moment = require('moment')
 const jwt = require('jsonwebtoken');
 const app = express();
+const { pool } = require('./controllers/bdConnection');
+
+const sql = fs.readFileSync('./db/db.sql').toString();
+
+const existsTables = pool.query(sql, function (err, result){
+    if(err){
+        console.log('error', err);
+    }else{
+        console.log("esquemas creados.");
+    }
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -29,6 +41,7 @@ app.listen(PORT, () => {
     console.log(data);
     console.log(`Servidor iniciado en ${PORT}`);
 });
+
 
 app.get("/api", (req, res) => {
     res.json({

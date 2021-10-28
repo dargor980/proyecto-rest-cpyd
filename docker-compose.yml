@@ -23,4 +23,8 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/paralela
       - DATABASE_HOST=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_DB=paralela
+      - DATABASE_PORT=5432
 

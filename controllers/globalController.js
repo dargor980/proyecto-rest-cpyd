@@ -1,15 +1,7 @@
 const request = require('request-promise');
 const cheerio = require('cheerio');
-const { Pool } = require('pg');
-
-
-const pool = new Pool({
-    host:'localhost',
-    user:'senku',
-    password:'root',
-    database:'paralela',
-    port:'5432'
-});
+const { pool } = require('./bdConnection');
+const moment = require('moment');
 
 async function init(){
     const $ = await request({
@@ -40,12 +32,34 @@ const loginClient = async (req, res) => {
 }
 
 const getStations = async (req, res) => {
-    const datos = await init();
-    res.json(datos)
+    try{
+        let stations = await pool.query('SELECT * FROM stations');
+        res.status(200).json(stations.rows);
+    } catch{
+        res.status(412).json({
+            fecha: moment().format('MMMM Do YYYY, h:mm:ss a'),
+            mensaje: 'Precondición Fallida'
+        });
+    }
 }
 
 const getStation = async (req, res) => {
-
+    try{
+        let response = await pool.query('SELECT * FROM stations WHERE id =$1', req.params.codigo);
+        if(response.rows.length = 0){
+            res.status(404).json({
+                fecha: moment().format('MMMM Do YYYY, h:mm:ss a'),
+                mensaje: 'No encontrado'
+            });
+        } else {
+            res.status(200).json(response.rows);
+        }
+    } catch {
+        res.status(412).json({
+            fecha: moment().format('MMMM Do YYYY, h:mm:ss a'),
+            mensaje: 'Precondición Fallida'
+        });
+    }
 }
 
 const search = async (req, res) => {
