@@ -7,31 +7,44 @@ CREATE TABLE IF NOT EXISTS users(
 
 CREATE TABLE IF NOT EXISTS stations(
     id SERIAL PRIMARY KEY,
-    nombre VARCHAR NOT NULL,
-    latitud FLOAT NOT NULL,
-    longitud FLOAT NOT NULL,
-    altura FLOAT NOT NULL
+    nombre VARCHAR NOT NULL UNIQUE,
+    latitud VARCHAR,
+    longitud VARCHAR,
+    altura FLOAT
 );
 
-CREATE TABLE IF NOT EXISTS fecha(
+CREATE TABLE IF NOT EXISTS precipitacion(
     id SERIAL PRIMARY KEY,
+    milimetros FLOAT NOT NULL,
     mes VARCHAR NOT NULL,
     dia VARCHAR NOT NULL,
-    anio VARCHAR NOT NULL
-);
-
-
-CREATE TABLE IF NOT EXISTS registers(
-    id SERIAL PRIMARY KEY,
-    temp_maxima FLOAT NOT NULL,
-    temp_minima FLOAT NOT NULL,
-    precipitacion FLOAT NOT NULL,
+    anio VARCHAR NOT NULL,
     id_station INT,
-    id_fecha INT,
     CONSTRAINT fk_station
         FOREIGN KEY(id_station)
-            REFERENCES stations(id),
-    CONSTRAINT fk_fecha
-        FOREIGN KEY(id_fecha)
-            REFERENCES fecha(id)
+            REFERENCES stations(id)
+);
+
+CREATE TABLE IF NOT EXISTS tmax(
+    id SERIAL PRIMARY KEY,
+    temperatura FLOAT NOT NULL,
+    mes VARCHAR NOT NULL,
+    dia VARCHAR NOT NULL,
+    anio VARCHAR NOT NULL,
+    id_station INT,
+    CONSTRAINT fk_station
+        FOREIGN KEY(id_station)
+            REFERENCES stations(id)
+);
+
+CREATE TABLE IF NOT EXISTS tmin(
+    id SERIAL PRIMARY KEY,
+    temperatura FLOAT NOT NULL,
+    mes VARCHAR NOT NULL,
+    dia VARCHAR NOT NULL,
+    anio VARCHAR NOT NULL,
+    id_station INT,
+    CONSTRAINT fk_station
+        FOREIGN KEY(id_station)
+            REFERENCES stations(id)
 );
