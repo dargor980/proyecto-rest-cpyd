@@ -11,13 +11,17 @@ const { pool } = require('./controllers/bdConnection');
 
 const sql = fs.readFileSync('./db/db.sql').toString();
 
-const existsTables = pool.query(sql, function (err, result){
-    if(err){
-        console.log('error', err);
-    }else{
-        console.log("esquemas creados.");
-    }
-});
+
+
+async function CreateData(){
+    const existsTables = await pool.query(sql, function (err, result){
+        if(err){
+            console.log('error', err);
+        }else{
+            console.log("esquemas creados.");
+        }
+    });
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

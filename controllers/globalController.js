@@ -10,7 +10,6 @@ const { Console } = require('console');
 
 const ConsoleProgressBar = require('console-progress-bar');
 
-
 async function init(){
     const $ = await request({
         uri: 'https://climatologia.meteochile.gob.cl/application/diario/boletinClimatologicoDiario/actual',
@@ -77,20 +76,13 @@ async function readDirectoriesXls(path){
     const dir = await fs.promises.opendir(path);
 
     //Progress indicator init and define total paths
-    const consoleProgressBar = new ConsoleProgressBar({ maxValue: 22 });
+    const consoleProgressBar = new ConsoleProgressBar({ maxValue: 23 });
 
     var start = Date.now();
 
     console.log('Init XLSX READ');
 
-    //AVOID HARD LOADING QUERY
-    var stopQuery = 'select * from tmin ORDER BY id DESC limit 1'
     try {
-        var stopQueryHasData = await pool.query(stopQuery);
-        if(stopQueryHasData['rows'].length > 0 && stopQueryHasData['rows'][0]['id'] > 200000){
-            console.log('XSLX DATA ALREADY LOADED');
-            consoleProgressBar.addValue(22);
-        }else {
             for await (const dirent of dir){
                 const data = await fs.promises.opendir(directoryPath + '/' + dirent.name)
                 console.log('Loading');
@@ -166,7 +158,7 @@ async function readDirectoriesXls(path){
                                                 var isPrecipitation = await pool.query(isPrecipitationQuery,[actuallyID,key,mesActual,itemFila['DIA']])
                                                 var actuallyPrecipitation = isPrecipitation['rows'][0]['exists'];
                                                 if(actuallyPrecipitation === false){
-                                                    await pool.query(precipitationQuery,[parseFloat(value),mesActual,itemFila['DIA'],key,actuallyID]);
+                                                    pool.query(precipitationQuery,[parseFloat(value),mesActual,itemFila['DIA'],key,actuallyID]);
                                                 }
                                             }
                                         } catch (error) {
@@ -191,7 +183,7 @@ async function readDirectoriesXls(path){
                                                 var isTmax = await pool.query(isTmaxQuery,[actuallyID,key,mesActual,itemFila['DIA']])
                                                 var actuallyTmax = isTmax['rows'][0]['exists'];
                                                 if(actuallyTmax === false){
-                                                    await pool.query(tMaxQuery,[parseFloat(value),mesActual,itemFila['DIA'],key,actuallyID]);
+                                                    pool.query(tMaxQuery,[parseFloat(value),mesActual,itemFila['DIA'],key,actuallyID]);
                                                 }
                                             }
                                         } catch (error) {
@@ -216,7 +208,7 @@ async function readDirectoriesXls(path){
                                                 var isTmin = await pool.query(isTminQuery,[actuallyID,key,mesActual,itemFila['DIA']])
                                                 var actuallyTmin = isTmin['rows'][0]['exists'];
                                                 if(actuallyTmin === false){
-                                                    await pool.query(tMinQuery,[parseFloat(value),mesActual,itemFila['DIA'],key,actuallyID]);
+                                                    pool.query(tMinQuery,[parseFloat(value),mesActual,itemFila['DIA'],key,actuallyID]);
                                                 }
                                             }
                                         } catch (error) {
@@ -234,7 +226,7 @@ async function readDirectoriesXls(path){
                     }
                 }
             }         
-        }
+        
     } catch (error) {
         console.log('AVOID QUERYES RELATED ERROR',error);      
     }
@@ -246,8 +238,6 @@ async function initData (){
     await readDirectoriesTxt(directoryPath).catch(console.error);
     await readDirectoriesXls(directoryPath).catch(console.error);
 }
-
-initData();
 
 const loginClient = async (req, res) => {
 
@@ -292,10 +282,23 @@ const getEstimate = async (req, res) => {
 
 }
 
+const populateDb = async (req,res) => {
+    try{
+        initData();
+        res.status(200).json('DB LOADING');
+    } catch {
+        res.status(412).json({
+            fecha: moment().format('MMMM Do YYYY, h:mm:ss a'),
+            mensaje: 'Precondición Fallida'
+        });
+    }
+}
+
 module.exports = {
     loginClient,
     getStations,
     getStation,
     search,
     getEstimate,
+    populateDb
 }
