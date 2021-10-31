@@ -4,6 +4,8 @@ const { pool } = require('./bdConnection');
 const moment = require('moment');
 var XLSX = require('xlsx')
 
+const jwt = require('jwt-simple');
+
 var fs = require('fs');
 const path = require('path');
 const { Console } = require('console');
@@ -249,18 +251,22 @@ const loginClient = async (req, res) => {
             var email = req.query.email;
             const user =  await pool.query('select exists(select 1 from users where usuario=$1 AND email=$2)', [usuario,email]);
             if (user['rows'][0]['exists'] != false) {
+                var token = createToken();
+                await pool.query('UPDATE users SET token=$1 where usuario=$2 AND email=$3',[token,usuario,email]);
                 res.status(200).json({ token: createToken()})
             } else {
                 res.status(401).json({ error: 'Error en usuario y/o email'});
             }
         }
     } catch (error) {
+        console.log(error);
         res.status(400).json(error);
     }
 }
 
 const createToken = () => {
     const payload = {
+        usuarioId: 1,
         createdAt: moment().unix(),
         expiredAt: moment().add(2, 'days').unix()
     }
@@ -288,7 +294,7 @@ const createUser = async (req, res) => {
 
 const getStations = async (req, res) => {
     try{
-        let stations = await pool.query('SELECT * FROM tmin');
+        let stations = await pool.query('SELECT * FROM stations');
         res.status(200).json(stations.rows);
     } catch{
         res.status(412).json({

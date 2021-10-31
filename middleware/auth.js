@@ -1,22 +1,30 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('jwt-simple');
+const moment = require('moment');
 
-function validateToken(req, res, next) {
-    const bearerHeader = req.headers['authorization'];
-    console.log(bearerHeader);
-    if (typeof bearerHeader != 'undefined') {
-        const bearer = bearerHeader.split(" ");
-        const bearerToken = bearer[1];
-        req.token = bearerToken;
-        next();
-    } else {
-        res.status(403).json({
-            fecha: moment().format('MMMM Do YYYY, h:mm:ss a'),
-            mensaje: "Unauthorized"
-        });
+const checkToken = (req, res, next) => {
+
+    if(!req.headers['user-token']) {
+        return res.json({ error: 'Necesitas incluir el user-token en la cabecera' });
     }
+
+    const userToken = req.headers['user-token'];
+    let payload = {};
+
+    try {
+        payload = jwt.decode(userToken, 'cheesburger');
+    } catch(err) {
+        return res.json({ error: 'El token es incorrecto' });
+    }
+
+    if(payload.expiredAt < moment().unix()) {
+        return res.json({ error: 'El Token ha expirado' });
+    }
+
+    req.usuarioId = payload.usuarioId;
+
+    next();
 }
 
-
 module.exports = {
-    validateToken,
+    checkToken: checkToken
 }
