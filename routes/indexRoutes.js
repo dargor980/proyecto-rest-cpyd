@@ -4,9 +4,10 @@ const app = express();
 const router = Router();
 
 
-const { loginClient, getStations, getStation, search, getEstimate, populateDb} = require('../controllers/globalController');
+const { loginClient, getStations, getStation, search, getEstimate, populateDb, createUser} = require('../controllers/globalController');
 
-router.post('/context/login', loginClient);
+router.post('/grupo-E/login', loginClient);
+router.post('/grupo-E/createUser/:user/:email',createUser);
 router.get('/context/stations', getStations);
 router.get('/context/:codigo/stations', getStation);
 router.post('/context/search', search);

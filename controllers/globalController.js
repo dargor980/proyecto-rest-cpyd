@@ -239,8 +239,27 @@ async function initData (){
     await readDirectoriesXls(directoryPath).catch(console.error);
 }
 
+
 const loginClient = async (req, res) => {
 
+}
+
+const createUser = async (req, res) => {
+    if( req.user != null && req.email != null){
+        try{
+        
+            let user = req.user;
+            let email = req.email;
+            let data = await pool.query('INSERT INTO users (user,email) VALUES($1, $2)', [user,email]);
+            res.status(200).json(data.rows);
+    
+        }catch(e){
+            res.status(409).json('El usuario ya existe.');
+        }
+    }else{
+        res.status(400).json('Los parametros user y email son obligatorios.');
+    }
+    
 }
 
 const getStations = async (req, res) => {
@@ -300,5 +319,6 @@ module.exports = {
     getStation,
     search,
     getEstimate,
-    populateDb
+    populateDb,
+    createUser
 }
