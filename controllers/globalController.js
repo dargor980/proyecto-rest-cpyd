@@ -241,16 +241,40 @@ async function initData (){
 
 
 const loginClient = async (req, res) => {
+    try {
+        if(req.query.user == null || req.query.email == null){
+            res.status(409).json('Los parametros user y email son requeridos');
+        }else{
+            var usuario = req.query.user;
+            var email = req.query.email;
+            const user =  await pool.query('select exists(select 1 from users where usuario=$1 AND email=$2)', [usuario,email]);
+            if (user['rows'][0]['exists'] != false) {
+                res.status(200).json({ token: createToken()})
+            } else {
+                res.status(401).json({ error: 'Error en usuario y/o email'});
+            }
+        }
+    } catch (error) {
+        res.status(400).json(error);
+    }
+}
 
+const createToken = () => {
+    const payload = {
+        createdAt: moment().unix(),
+        expiredAt: moment().add(2, 'days').unix()
+    }
+
+    return jwt.encode(payload, 'cheesburger');
 }
 
 const createUser = async (req, res) => {
-    if( req.user != null && req.email != null){
+    if( req.query.user != null && req.query.email != null){
         try{
         
-            let user = req.user;
-            let email = req.email;
-            let data = await pool.query('INSERT INTO users (user,email) VALUES($1, $2)', [user,email]);
+            let user = req.query.user;
+            let email = req.query.email;
+            let data = await pool.query('INSERT INTO users(usuario,email) VALUES($1, $2)', [user,email]);
             res.status(200).json(data.rows);
     
         }catch(e){
