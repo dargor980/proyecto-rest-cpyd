@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users(
     id SERIAL PRIMARY KEY,
-    usuario VARCHAR NOT NULL UNIQUE,
     email VARCHAR NOT NULL UNIQUE,
+    pass VARCHAR NOT NULL UNIQUE,
     token VARCHAR 
 );
 
@@ -16,9 +16,7 @@ CREATE TABLE IF NOT EXISTS stations(
 CREATE TABLE IF NOT EXISTS precipitacion(
     id SERIAL PRIMARY KEY,
     milimetros FLOAT NOT NULL,
-    mes VARCHAR NOT NULL,
-    dia VARCHAR NOT NULL,
-    anio VARCHAR NOT NULL,
+    fecha DATE NOT NULL,
     id_station INT,
     CONSTRAINT fk_station
         FOREIGN KEY(id_station)
@@ -28,9 +26,7 @@ CREATE TABLE IF NOT EXISTS precipitacion(
 CREATE TABLE IF NOT EXISTS tmax(
     id SERIAL PRIMARY KEY,
     temperatura FLOAT NOT NULL,
-    mes VARCHAR NOT NULL,
-    dia VARCHAR NOT NULL,
-    anio VARCHAR NOT NULL,
+    fecha DATE NOT NULL,
     id_station INT,
     CONSTRAINT fk_station
         FOREIGN KEY(id_station)
@@ -40,9 +36,7 @@ CREATE TABLE IF NOT EXISTS tmax(
 CREATE TABLE IF NOT EXISTS tmin(
     id SERIAL PRIMARY KEY,
     temperatura FLOAT NOT NULL,
-    mes VARCHAR NOT NULL,
-    dia VARCHAR NOT NULL,
-    anio VARCHAR NOT NULL,
+    fecha DATE NOT NULL,
     id_station INT,
     CONSTRAINT fk_station
         FOREIGN KEY(id_station)
