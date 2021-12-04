@@ -37,7 +37,7 @@ async function init(){
 
 const daily = async (req, res) => { // Scrapping 
     var result = await init();
-    res.status(200).json(result);
+    res.status(200).json({result:result, status:200});
 }
 const directoryPath = path.join(__dirname, 'Estaciones');
 
@@ -286,7 +286,7 @@ const loginClient = async (req, res) => { //Listo
             if (user['rows'][0]['exists'] != false) {
                 var token = createToken();
                 await pool.query('UPDATE users SET token=$1 where pass=$2 AND email=$3',[token,pass,email]);
-                res.status(200).json({ token: createToken()})
+                res.status(200).json({ token: createToken(), status:200})
             } else {
                 res.status(401).json({ error: 'Error en email y/o password'});
             }
@@ -312,7 +312,7 @@ const createUser = async (req, res) => { //Listo
             let pass = req.query.pass;
             let email = req.query.email;
             let data = await pool.query('INSERT INTO users(pass,email) VALUES($1, $2)', [pass,email]);
-            res.status(200).json(data.rows);
+            res.status(200).json({status:200});
     
         }catch(e){
             res.status(409).json('El usuario ya existe.');
@@ -474,7 +474,7 @@ const getEstimate = async (req, res) => { //Listo
 const populateDb = async (req,res) => { //Listo
     try{
         initData();
-        res.status(200).json('DB LOADING');
+        res.status(200).json({status:200, response: 'DB LOADING'});
     } catch {
         res.status(412).json({
             fecha: moment().format('MMMM Do YYYY, h:mm:ss a'),
