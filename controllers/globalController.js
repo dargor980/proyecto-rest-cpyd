@@ -296,6 +296,22 @@ const loginClient = async (req, res) => { //Listo
         res.status(400).json(error);
     }
 }
+const loginGoogle = async(req,res) => {
+    try {
+        if( req.query.email == null || req.query.tokenGoogle == null){
+            res.status(409).json('Los parametros email y tokenGoogle son requeridos');
+        }else{
+            var email = req.query.email;
+            const user =  await pool.query('select exists(select 1 from users where email=$2)', [email]);
+            var token = createToken();
+            await pool.query('UPDATE users SET token=$1 where AND email=$3',[token,email]);
+            res.status(200).json({ token: createToken(), status:200})
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(400).json(error);
+    }
+}
 const createToken = () => { //Listo
     const payload = {
         usuarioId: 1,
@@ -485,6 +501,7 @@ const populateDb = async (req,res) => { //Listo
 
 module.exports = {
     loginClient,
+    loginGoogle,
     getStations,
     getStation,
     search,

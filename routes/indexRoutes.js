@@ -4,9 +4,10 @@ const app = express();
 const router = Router();
 const middleware = require('../middleware/auth');
 
-const { loginClient, getStations, getStation, search, getEstimate, populateDb, createUser, daily} = require('../controllers/globalController');
+const { loginClient, getStations, getStation, search, getEstimate, populateDb, createUser, daily, loginGoogle} = require('../controllers/globalController');
 
 router.post('/grupo-E/login', loginClient);
+router.post('/grupo-E/loginGoogle',loginGoogle);
 router.post('/grupo-E/createUser/',createUser);
 router.get('/grupo-E/:indicador/:fechadesde/:fechahasta/search',middleware.checkToken, search); // ,precipitacion, tmax, tmin
 router.get('/grupo-E/stations',middleware.checkToken, getStations);
