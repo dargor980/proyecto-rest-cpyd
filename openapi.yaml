@@ -1,0 +1,155 @@
+openapi: 3.0.1
+info:
+  title: API Clima
+  description: >-
+    Esta API se encarga de manejar la informacion relacionada a precipitaciones,
+    temperatura máxima y mínima de Chile desde el año 1950.
+  version: 1.0.0
+servers:
+  - url: https://grupo-E/
+  - url: http://grupo-E/
+tags:
+  - name: createUser
+    description: Este endpoint crea un usuario con los parametros email, contraseña.
+  - name: login
+    description: Se inicia sesión con los parametros email, contraseña retorna token.
+  - name: search
+    description: Maneja la información de un indicador entre dos fechas.
+  - name: stations
+    description: Maneja la información de las estaciones registradas.
+  - name: daily
+    description: Maneja la información de indicadores de las estaciones del día actual.
+  - name: estimate
+    description: >-
+      Maneja la información de estimación de un indicador a traves de su
+      ubicación.
+  - name: populate
+    description: Maneja la información para poblar la DB
+paths:
+  /createUser:
+    post:
+      tags:
+        - createUser
+      summary: Crear un nuevo usuario
+      requestBody:
+        content:
+          application/json: {}
+        required: true
+      responses:
+        '200':
+          description: correcto
+          content: {}
+        '400':
+          description: Los parametros pass y email son obligatorios.
+        '409':
+          description: El usuario y existe.
+      x-codegen-request-body-name: email
+  /login:
+    post:
+      tags:
+        - createUser
+      summary: Crear un nuevo usuario
+      requestBody:
+        description: Pet object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: correcto
+          content: {}
+        '400':
+          description: error
+          content: {}
+        '401':
+          description: Error en email y/o password
+          content: {}
+        '409':
+          description: Los parametros email y pass son requeridos.
+          content: {}
+      x-codegen-request-body-name: body
+  /stations:
+    get:
+      tags:
+        - stations
+      summary: Trae las estaciones
+      responses:
+        '200':
+          description: correcto
+        '404':
+          description: No encontrado
+        '412':
+          description: Precondición Fallida
+  /{codigo}/stations:
+    get:
+      tags:
+        - stations
+      summary: Trae una estación específica
+      responses:
+        '200':
+          description: correcto
+        '412':
+          description: Precondición Fallida
+  /daily:
+    get:
+      tags:
+        - stations
+      summary: trae los indicadores del día
+      responses:
+        '200':
+          description: correcto
+  /{indicador}/{fechadesde}/{fechahasta}/search:
+    get:
+      tags:
+        - indicador
+      summary: busca los daatos de un indicador entre dos fechas
+      responses:
+        '404':
+          description: No encontrado
+        '412':
+          description: Preciondición Fallida
+  /{indicador}/{latitud}/{longitud}/estimate:
+    get:
+      tags:
+        - stations
+      summary: estima la cantidad de agua caida en un lugar dadoo por coordenadas
+      responses:
+        '404':
+          description: No encontrado
+        '412':
+          description: Preciondición Fallida
+  /populate:
+    get:
+      tags:
+        - stations
+        - indicador
+      summary: Pobla la DB con los datos obtenidos de los registros
+      responses:
+        '412':
+          description: Precondición fallida
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+        pass:
+          type: string
+        token:
+          type: string
+    Station:
+      type: object
+      properties:
+        latitud:
+          type: string
+        longitud:
+          type: string
+        altura:
+          type: string
+        codigo:
+          type: integer
+    Indicador:
+      type: string
